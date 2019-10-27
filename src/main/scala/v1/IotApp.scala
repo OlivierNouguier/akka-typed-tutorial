@@ -8,7 +8,7 @@ object IotApp extends App {
 
   val system = ActorSystem[Nothing](IotSupervisor(), "iot-supervisor")
 
-  sys.addShutdownHook { () =>
+  sys.addShutdownHook {
     println("Byebye!")
     val terminate = system.whenTerminated
     Await.result(terminate, Duration("10 seconds"))

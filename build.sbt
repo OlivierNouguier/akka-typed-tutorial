@@ -1,3 +1,8 @@
+
+name := "akka-typed-tutorial"
+
+scalaVersion := "2.13.1"
+
 scalafmtOnCompile := true
 
 val akkaVersion = "2.6.0-RC1"

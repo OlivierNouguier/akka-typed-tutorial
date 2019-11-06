@@ -6,6 +6,8 @@ import org.scalatest.WordSpecLike
 import v1.Device.RecordTemperature
 import v1.Device.TemperatureRecorded
 
+import scala.concurrent.duration.DurationInt
+
 class DeviceGroupSpec extends ScalaTestWithActorTestKit with WordSpecLike {
   "Device group" should {
     "be able to register device" in {
@@ -30,6 +32,30 @@ class DeviceGroupSpec extends ScalaTestWithActorTestKit with WordSpecLike {
       deviceActor2 ! Device.RecordTemperature(requestId = 1, 2.0, recordProbe.ref)
       recordProbe.expectMessage(Device.TemperatureRecorded(requestId = 1))
 
+    }
+    "ignores message in wrong group" in {
+      val probe = createTestProbe[DeviceRegistered]()
+      val groupActor = spawn(DeviceGroup("group"))
+
+      groupActor ! RequestTrackDevice("wrongGroup", "deviceId", probe.ref)
+
+      probe.expectNoMessage(500.milliseconds)
+
+    }
+
+    "returns same actor for the same device" in {
+      val probe = createTestProbe[DeviceRegistered]()
+      val groupActor = spawn(DeviceGroup("group"))
+
+      groupActor ! RequestTrackDevice("group", "device-1", probe.ref)
+
+      val deviceActor1 = probe.receiveMessage()
+
+      groupActor ! RequestTrackDevice("group", "device-1", probe.ref)
+
+      val deviceActor2 = probe.receiveMessage()
+
+      deviceActor1.device should ===(deviceActor2.device)
     }
   }
 }

@@ -22,6 +22,5 @@ object TestUser extends App {
   allAdultCanDrink.check()
 
   implicit val userOrdering: Ordering[User] = Ordering.by(_.age)
-  
-  
+
 }

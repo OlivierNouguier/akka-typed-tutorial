@@ -12,6 +12,7 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 
 libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.8",
+    "org.scalacheck" % "scalacheck_2.13" % "1.14.2",
     "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion,
     ).map(_ % Test)
 

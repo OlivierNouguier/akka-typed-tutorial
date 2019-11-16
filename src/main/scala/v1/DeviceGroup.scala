@@ -13,6 +13,12 @@ object DeviceGroup {
 
   trait Command
 
+  final case class ReplyDeviceList(requestId: Long, ids: Set[String])
+
+  final case class RequestDeviceList(requestId: Long, groupId: String, replyTo: ActorRef[ReplyDeviceList])
+      extends DeviceManager.Command
+      with Command
+
   private final case class DeviceTerminated(device: ActorRef[Device.Command], groupId: String, deviceId: String)
       extends Command
 
@@ -21,6 +27,7 @@ object DeviceGroup {
 class DeviceGroup(context: ActorContext[DeviceGroup.Command], groupId: String)
     extends AbstractBehavior[DeviceGroup.Command](context) {
 
+  import DeviceGroup._
   import DeviceManager._
 
   context.log.info(s"Device group $groupId started")
@@ -34,6 +41,7 @@ class DeviceGroup(context: ActorContext[DeviceGroup.Command], groupId: String)
           case None =>
             context.log.debug(s"Spawn device $groupId-$deviceId")
             val deviceActor = context.spawn(Device(groupId, deviceId), s"device-$deviceId")
+            context.watchWith(deviceActor, DeviceTerminated(deviceActor, groupId, deviceId))
             deviceIdToActor += deviceId -> deviceActor
             replyTo ! DeviceRegistered(deviceActor)
 
@@ -43,6 +51,17 @@ class DeviceGroup(context: ActorContext[DeviceGroup.Command], groupId: String)
         this
       case RequestTrackDevice(otherGroupId, _, _) =>
         context.log.warn(s"This device group($groupId) does not handle device targeted to $otherGroupId")
+        this
+
+      case RequestDeviceList(requestId, gId, replyTo) =>
+        if (groupId == gId) {
+          replyTo ! ReplyDeviceList(requestId, deviceIdToActor.keySet)
+          this
+        } else Behaviors.unhandled
+
+      case DeviceTerminated(_, _, deviceId) =>
+        deviceIdToActor -= deviceId
+        context.log.info(s"Device actor for $deviceId has terminated.")
         this
 
     }

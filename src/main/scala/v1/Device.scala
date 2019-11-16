@@ -18,6 +18,7 @@ object Device {
   final case class RecordTemperature(requestId: Long, value: Double, replyTo: ActorRef[TemperatureRecorded])
       extends Command
   final case class TemperatureRecorded(requestId: Long) extends Command
+  final object Passivate extends Command
 }
 
 class Device(context: ActorContext[Device.Command], groupId: String, deviceId: String)
@@ -36,6 +37,9 @@ class Device(context: ActorContext[Device.Command], groupId: String, deviceId: S
     case ReadTemperature(requestId, replyTo) =>
       replyTo ! RespondTemperature(requestId, lastTemperatureReading)
       this
+
+    case Passivate =>
+      Behaviors.stopped
   }
 
   override def onSignal: PartialFunction[Signal, Behavior[Device.Command]] = {

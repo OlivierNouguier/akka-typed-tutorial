@@ -7,8 +7,8 @@ import v1.Device.RecordTemperature
 import v1.Device._
 
 import scala.concurrent.duration.DurationInt
-import v1.DeviceGroup.ReplyDeviceList
-import v1.DeviceGroup.RequestDeviceList
+import v1.DeviceManager.ReplyDeviceList
+import v1.DeviceManager.RequestDeviceList
 
 class DeviceGroupSpec extends ScalaTestWithActorTestKit with WordSpecLike {
   "Device group" should {

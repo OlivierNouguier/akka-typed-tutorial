@@ -13,12 +13,6 @@ object DeviceGroup {
 
   trait Command
 
-  final case class ReplyDeviceList(requestId: Long, ids: Set[String])
-
-  final case class RequestDeviceList(requestId: Long, groupId: String, replyTo: ActorRef[ReplyDeviceList])
-      extends DeviceManager.Command
-      with Command
-
   private final case class DeviceTerminated(device: ActorRef[Device.Command], groupId: String, deviceId: String)
       extends Command
 

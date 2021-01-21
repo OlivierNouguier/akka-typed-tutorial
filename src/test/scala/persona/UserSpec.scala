@@ -1,11 +1,11 @@
 package persona
 import org.scalatest.WordSpec
-import org.scalatest.Matchers
+
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
-class UserSpec extends WordSpec with Matchers {
+class UserSpec extends WordSpec {
 
   implicit val randomUser: Arbitrary[User] = Arbitrary(for {
     randomName <- Gen.alphaStr
